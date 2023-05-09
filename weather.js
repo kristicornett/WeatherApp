@@ -24,8 +24,8 @@ function parseCurrentWeather({ current_weather, daily }) {
     const { 
         temperature_2m_max: [maxTemp], 
         temperature_2m_min: [minTemp], 
-        apparentTemperature_2m_max: [maxFeelsLike], 
-        apparentTemperature_2m_min: [minFeelsLike], 
+        apparent_temperature_max: [maxFeelsLike], 
+        apparent_temperature_min: [minFeelsLike], 
         precipitation_sum: [precip] 
     } = daily
     return {
@@ -42,24 +42,24 @@ function parseCurrentWeather({ current_weather, daily }) {
 }
 
 function parseDailyWeather({ daily }) {
-    return daily.time.map((time, index => {
+    return daily.time.map((time, index) => {
         return {
             timestamp: time * 1000, //returns in seconds so converting to milliseconds
             iconCode: daily.weathercode[index],
-            maxTemp: Math.round(daily.temp_2m_max[index])
+            maxTemp: Math.round(daily.temperature_2m_max[index])
         }
-    }))
+    })
 }
 
 function parseHourlyWeather({ hourly, current_weather }) {
-    return hourly.time.map((time, index => {
+    return hourly.time.map((time, index) => {
         return {
-            timestamp: time * 1000,
+            timestamp:  time * 1000,
             iconCode: hourly.weathercode[index],
             temp: Math.round(hourly.temperature_2m[index]),
             feelsLike: Math.round(hourly.apparent_temperature[index]),
             windSpeed: Math.round(hourly.windspeed_10m[index]),
             precip: Math.round(hourly.precipitation[index] * 100) / 100
         }
-    })).filter(({ timestamp }) => timestamp >= current_weather.time * 1000) //multiplying by 1000 because my original time is multiplied by 1000
+    }).filter(({ timestamp }) => timestamp >= current_weather.time * 1000) //multiplying by 1000 because my original time is multiplied by 1000
 }

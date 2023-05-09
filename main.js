@@ -1,6 +1,7 @@
 
 import { getWeather } from './weather.js'
 import './style.css'
+import { ICON_MAP } from './icons.js'
 
 
 getWeather(10, 10, Intl.DateTimeFormat().resolvedOptions().timeZone)
@@ -16,12 +17,18 @@ function renderWeather({ current, daily, hourly }) {
   renderHourlyWeather(hourly)
   document.body.classList.remove('blur')
 }
-
+// setting helper function SetValue to take care of all the query selectors document.querySelector('[data-current-temp]').textContent = current.currentTemp
 function setValue(selector, value, { parent = document } = {}) {
-  parent.querySelector(`[data]-${selector}]`).textContent = value
+  parent.querySelector(`[data-${selector}]`).textContent = value
 }
 
+function getIconUrl(iconCode) {
+  return `icons/${ICON_MAP.get(iconCode)}.svg`
+}
+
+const currentIcon = document.querySelector('[data-current-icon]')
 function renderCurrentWeather(current) {
+  currentIcon.src = getIconUrl(current.iconCode)
   setValue("current-temp", current.currentTemp)
   setValue("current-high", current.highTemp)
   setValue("current-low", current.lowTemp)
@@ -31,4 +38,46 @@ function renderCurrentWeather(current) {
   setValue("current-precip", current.precip)
 }
 
-// setting helper function SetValue to take care of all the query selectors document.querySelector('[data-current-temp]').textContent = current.currentTemp
+//making formatter to convert time
+const day_formatter = Intl.DateTimeFormat(undefined, {weekday: 'long'})
+
+const dailySection = document.querySelector('[data-day-section]')
+const dayCardTemplate = document.getElementById('day-card-template')
+function renderDailyWeather(daily) {
+  dailySection.innerHTML = ''
+  daily.forEach(day => {
+    const element = dayCardTemplate.content.cloneNode(true)
+    //how to clone a template clones all children as well
+
+    //set value to the element above parent is current element and I want to search the element above
+    setValue('temp', day.maxTemp, { parent: element})
+    setValue('date', day_formatter.format(day.timestamp), {parent: element})
+    element.querySelector('[data-icon]').src = getIconUrl(day.iconCode)
+    dailySection.append(element)
+  })
+
+}
+
+const hour_formatter = Intl.DateTimeFormat(undefined, {hour: 'numeric'})
+
+const hourSection = document.querySelector('[data-hour-section]')
+const hourRowTemplate = document.getElementById('hour-row-template')
+function renderHourlyWeather(hourly) {
+  hourSection.innerHTML = ''
+  hourly.forEach(hour => {
+    const element = hourRowTemplate.content.cloneNode(true)
+    //how to clone a template clones all children as well
+
+    //set value to the element above parent is current element and I want to search the element above
+    setValue('temp', hour.maxTemp, { parent: element})
+    setValue('fl-temp', hour.feelsLike, {parent: element})
+    setValue('wind', hour.windSpeed, {parent: element})
+    setValue('precip', hour.precip, {parent: element})
+    setValue('day', day_formatter.format(hour.timestamp), {parent: element})
+    setValue('time', hour_formatter.format(hour.timestamp), {parent: element})
+    element.querySelector('[data-icon]').src = getIconUrl(hour.iconCode)
+    hourSection.append(element)
+  })
+
+} 
+
