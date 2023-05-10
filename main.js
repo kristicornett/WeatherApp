@@ -1,15 +1,39 @@
 
 import { getWeather } from './weather.js'
-import './style.css'
 import { ICON_MAP } from './icons.js'
 
+//navigator.geolocation.getCurrentPosition(positionSuccess, positionError)
 
-getWeather(10, 10, Intl.DateTimeFormat().resolvedOptions().timeZone)
-.then(renderWeather)
-.catch(error => {
+/*function positionSuccess ({ coords }) {
+  getWeather(coords.latitude, 
+    coords.longitude, 
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+    )
+  .then(renderWeather)
+  .catch(error => {
   console.error(error)
   alert("Error fetching weather")
 })
+
+}
+*/
+getWeather(36, 
+  -86, 
+  Intl.DateTimeFormat().resolvedOptions().timeZone
+  )
+.then(renderWeather)
+.catch(error => {
+console.error(error)
+alert("Error fetching weather")
+})
+
+
+
+function positionError () {
+  alert("There was an error fetching your location.")
+}
+
+
 
 function renderWeather({ current, daily, hourly }) {
   renderCurrentWeather(current)
@@ -69,7 +93,7 @@ function renderHourlyWeather(hourly) {
     //how to clone a template clones all children as well
 
     //set value to the element above parent is current element and I want to search the element above
-    setValue('temp', hour.maxTemp, { parent: element})
+    //setValue('temp', hour.temp, { parent: element})
     setValue('fl-temp', hour.feelsLike, {parent: element})
     setValue('wind', hour.windSpeed, {parent: element})
     setValue('precip', hour.precip, {parent: element})
